@@ -18,6 +18,8 @@
             v-for="task in tasks"
             :key="task.id"
             :task="task"
+            @done="taskDone(task)"
+            @deleteTask="deleteTask(task.id)"
           ></TaskCard>
         </v-tabs-window-item>
 
@@ -51,13 +53,22 @@ export default {
     const tasksStore = useTasksStore();
     const { tasks } = storeToRefs(tasksStore);
 
+    function taskDone (task) {
+      tasksStore.taskDone(task)
+    }
+    function deleteTask (taskId) {
+      tasksStore.deleteTask(taskId)
+    }
+
     onMounted(() => {
       tasksStore.getTasksList();
     })
 
     return {
       selectedTab,
-      tasks
+      tasks,
+      taskDone,
+      deleteTask
     }
   }
 }

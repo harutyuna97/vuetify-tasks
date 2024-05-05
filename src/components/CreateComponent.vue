@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import {useDate} from "vuetify";
 import {useTasksStore} from "@/stores/app";
 
@@ -98,6 +98,14 @@ export default {
       tasksStore.addTask(requestData.value)
     }
 
+    const changeDateFormat = computed(() => {
+      if (!requestData.value.date) {
+        return null
+      }
+      const [month, day, year] = useDate().format(requestData.value.date, 'keyboardDate').split('/')
+      return `${day}-${month}-${year}`
+    })
+
     return {
       requestData,
       titleRules,
@@ -106,16 +114,8 @@ export default {
       isFormValid,
       sprintRules,
       sprintList,
-      submitForm
-    }
-  },
-  computed: {
-    changeDateFormat() {
-      if (!this.requestData.date) {
-        return null
-      }
-      const [month, day, year] = useDate().format(this.requestData.date, 'keyboardDate').split('/')
-      return `${day}-${month}-${year}`
+      submitForm,
+      changeDateFormat
     }
   }
 }

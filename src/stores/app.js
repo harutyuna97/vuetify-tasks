@@ -3,10 +3,13 @@ import { defineStore } from 'pinia'
 import { useNotificationsStore } from './notifications'
 import axios from "axios";
 import {Constants} from "@/constants/constants";
+import done from '@/assets/done.mp3'
 
 const fbUrl = 'https://vuetify-tasks-default-rtdb.firebaseio.com/tasks'
 
 const notificationsStore = useNotificationsStore();
+
+const inFlightUrls = new Set();
 
 export const useTasksStore = defineStore('tasks', {
   state: () => ({
@@ -16,8 +19,13 @@ export const useTasksStore = defineStore('tasks', {
   actions: {
 
     getTasksList() {
+      const url = fbUrl + '.json'
+      const inFlight = inFlightUrls.has(url);
+      if (inFlight) {
+        return;
+      }
       this.tasks = [];
-      const request = axios.get(fbUrl + '.json');
+      const request = axios.get(url);
       request.then(d => {
         if (d.data) {
           const requestData = Object.keys(d.data).map((key) => [key, d.data[key]]);
@@ -30,10 +38,17 @@ export const useTasksStore = defineStore('tasks', {
       request.catch(error => {
         notificationsStore.messages.push({type: Constants.MessageTypes.ERROR, message: error.message, show: true})
       })
+      request.finally(() => inFlightUrls.delete(url))
     },
 
     addTask(task) {
-      const request = axios.post(fbUrl + '.json', task)
+      const url = fbUrl + '.json'
+      const inFlight = inFlightUrls.has(url);
+      if (inFlight) {
+        return;
+      }
+      inFlightUrls.add(url);
+      const request = axios.post(url, task)
       request.then(() => {
         this.tasks.push(task)
         this.router.push('/')
@@ -42,10 +57,17 @@ export const useTasksStore = defineStore('tasks', {
       request.catch(error => {
         notificationsStore.messages.push({type: Constants.MessageTypes.ERROR, message: error.message, show: true})
       })
+      request.finally(() => inFlightUrls.delete(url))
     },
 
     deleteTask(taskId) {
-      const request = axios.delete(fbUrl + '/' + taskId + '.json')
+      const url = fbUrl + '/' + taskId + '.json'
+      const inFlight = inFlightUrls.has(url);
+      if (inFlight) {
+        return;
+      }
+      inFlightUrls.add(url);
+      const request = axios.delete(url)
       request.then(() => {
         const idx = this.tasks.findIndex(task => task.id === taskId)
         this.tasks.splice(idx, 1)
@@ -54,6 +76,28 @@ export const useTasksStore = defineStore('tasks', {
       request.catch(error => {
         notificationsStore.messages.push({type: Constants.MessageTypes.ERROR, message: error.message, show: true})
       })
+      request.finally(() => inFlightUrls.delete(url))
+    },
+
+    taskDone(task) {
+      const url = fbUrl + '/' + task.id + '.json'
+      const inFlight = inFlightUrls.has(url);
+      if (inFlight) {
+        return;
+      }
+      inFlightUrls.add(url);
+      const request = axios.patch(url, {done: !task.done})
+      request.then(() => {
+        task.done = !task.done
+        if (task.done) {
+          const audio = new Audio(done)
+          audio.play()
+        }
+      })
+      request.catch(error => {
+        notificationsStore.messages.push({type: Constants.MessageTypes.ERROR, message: error.message, show: true})
+      })
+      request.finally(() => inFlightUrls.delete(url) )
     },
   }
 })
