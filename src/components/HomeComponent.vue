@@ -1,5 +1,5 @@
 <template>
-  <h1 class="ml-10 mt-5">List of tasks</h1>
+  <h1 class="ml-10 mt-5">List of Tasks</h1>
   <v-card class="rounded-0">
     <v-tabs
       v-model="selectedTab"

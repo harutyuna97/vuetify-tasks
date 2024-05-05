@@ -14,20 +14,46 @@
         <v-icon size="x-small" icon="mdi-calendar" ></v-icon>
         <span class="ml-1">{{formattedDate}}</span>
       </div>
-      <v-icon
-        color="red"
-        size="large"
-        class="mt-4 cursor-pointer"
-        icon="mdi-delete"
-        @click="deleteTask"
-      ></v-icon>
+      <v-dialog
+        v-model="confirmDialog"
+        max-width="400"
+        persistent
+      >
+        <template v-slot:activator="{ props: activatorProps }">
+          <v-icon
+            v-bind="activatorProps"
+            color="red"
+            size="large"
+            class="mt-4 cursor-pointer"
+            icon="mdi-delete"
+          ></v-icon>
+        </template>
+
+        <v-card
+          prepend-icon="mdi-warning"
+          text="Are you sure you want to delete this task?"
+          title="Delete task"
+        >
+          <template v-slot:actions>
+            <v-spacer></v-spacer>
+
+            <v-btn @click="deleteTask">
+              Yes
+            </v-btn>
+
+            <v-btn @click="confirmDialog = false">
+              No
+            </v-btn>
+          </template>
+        </v-card>
+      </v-dialog>
     </div>
   </v-card>
 </template>
 
 <script>
 import {useDate} from "vuetify";
-import {computed} from "vue";
+import {ref, computed} from "vue";
 
 export default {
   props: {
@@ -55,10 +81,13 @@ export default {
       emit('deleteTask')
     }
 
+    const confirmDialog = ref(false)
+
     return {
       formattedDate,
       doneChanged,
-      deleteTask
+      deleteTask,
+      confirmDialog
     }
   }
 }

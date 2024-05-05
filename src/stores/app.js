@@ -4,6 +4,7 @@ import { useNotificationsStore } from './notifications'
 import axios from "axios";
 import {Constants} from "@/constants/constants";
 import done from '@/assets/done.mp3'
+import deleteAudio from '@/assets/delete.mp3'
 
 const fbUrl = 'https://vuetify-tasks-default-rtdb.firebaseio.com/tasks'
 
@@ -69,6 +70,8 @@ export const useTasksStore = defineStore('tasks', {
       inFlightUrls.add(url);
       const request = axios.delete(url)
       request.then(() => {
+        const audio = new Audio(deleteAudio)
+        audio.play()
         const idx = this.tasks.findIndex(task => task.id === taskId)
         this.tasks.splice(idx, 1)
         notificationsStore.messages.push({type: Constants.MessageTypes.SUCCESS, message: 'Task successfully deleted', show: true})
