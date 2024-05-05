@@ -8,7 +8,7 @@
         <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
 
-      <v-app-bar-title>Tasks app</v-app-bar-title>
+      <v-app-bar-title class="cursor-pointer" @click="$router.push('/')">Tasks app</v-app-bar-title>
     </v-app-bar>
     <v-navigation-drawer
       v-model="drawer"

@@ -77,11 +77,11 @@ export default {
     const tasksStore = useTasksStore();
 
     const titleRules = [
-      value => !!value.trim() || 'This field is required',
+      value => !!value?.trim() || 'This field is required',
     ]
 
     const descriptionRules = [
-      value => !!value.trim() || 'This field is required',
+      value => !!value?.trim() || 'This field is required',
     ]
 
     const sprintRules = [
