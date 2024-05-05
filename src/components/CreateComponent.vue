@@ -44,9 +44,9 @@
           item-value="value"
         ></v-select>
         <v-radio-group label="Priority" v-model="requestData.priority">
-          <v-radio label="Minor" value="MINOR" color="green"></v-radio>
-          <v-radio label="Major" value="MAJOR" color="yellow"></v-radio>
-          <v-radio label="Critical" value="CRITICAL" color="red"></v-radio>
+          <v-radio label="Minor" :value="priorities.MINOR" color="green"></v-radio>
+          <v-radio label="Major" :value="priorities.MAJOR" color="yellow"></v-radio>
+          <v-radio label="Critical" :value="priorities.CRITICAL" color="red"></v-radio>
         </v-radio-group>
 
         <v-btn :disabled="!isFormValid" class="my-4" type="submit" block>Submit</v-btn>
@@ -59,15 +59,18 @@
 import {ref, computed} from "vue";
 import {useDate} from "vuetify";
 import {useTasksStore} from "@/stores/app";
+import {Constants} from "@/constants/constants";
 
 export default {
   setup() {
+    const priorities = computed(() =>  Constants.Priorities)
+
     const requestData = ref({
       title: null,
       description: null,
       date: new Date(),
       sprint: null,
-      priority: 'MINOR',
+      priority: priorities.value.MINOR,
       done: false
     })
 
@@ -115,7 +118,8 @@ export default {
       sprintRules,
       sprintList,
       submitForm,
-      changeDateFormat
+      changeDateFormat,
+      priorities
     }
   }
 }

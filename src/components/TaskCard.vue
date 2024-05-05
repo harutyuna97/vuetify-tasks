@@ -1,5 +1,8 @@
 <template>
-  <v-card width="90%" class="mx-auto my-4 pa-4">
+  <v-card
+    width="90%"
+    class="mx-auto my-4 pa-4"
+  >
     <div class="d-flex">
       <v-checkbox
         width="max-content"
@@ -22,7 +25,6 @@
         <template v-slot:activator="{ props: activatorProps }">
           <v-icon
             v-bind="activatorProps"
-            color="red"
             size="large"
             class="mt-4 cursor-pointer"
             icon="mdi-delete"
@@ -30,7 +32,7 @@
         </template>
 
         <v-card
-          prepend-icon="mdi-warning"
+          prepend-icon="mdi-alert"
           text="Are you sure you want to delete this task?"
           title="Delete task"
         >
@@ -48,12 +50,22 @@
         </v-card>
       </v-dialog>
     </div>
+    <div
+      class="priorityLine"
+      :class="{
+        'bg-green' : task.priority === priorities.MINOR,
+        'bg-yellow' : task.priority === priorities.MAJOR,
+        'bg-red' : task.priority === priorities.CRITICAL,
+      }"
+      v-tooltip="'Priority: ' + task.priority"
+    ></div>
   </v-card>
 </template>
 
 <script>
 import {useDate} from "vuetify";
 import {ref, computed} from "vue";
+import {Constants} from "@/constants/constants";
 
 export default {
   props: {
@@ -73,6 +85,8 @@ export default {
       return useDate().format(props.task.date, 'fullDate')
     })
 
+    const priorities = computed(() =>  Constants.Priorities)
+
     function doneChanged() {
       emit('done')
     }
@@ -87,7 +101,8 @@ export default {
       formattedDate,
       doneChanged,
       deleteTask,
-      confirmDialog
+      confirmDialog,
+      priorities
     }
   }
 }
@@ -96,5 +111,8 @@ export default {
 <style lang="scss">
 .cardContainer {
   width: 90%;
+};
+.priorityLine {
+  height: 5px;
 }
 </style>
