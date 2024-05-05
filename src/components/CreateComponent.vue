@@ -1,7 +1,7 @@
 <template>
   <div class="mt-10">
     <v-sheet class="mx-auto" width="80%">
-      <v-form v-model="isFormValid" @submit.prevent>
+      <v-form v-model="isFormValid" @submit.prevent="submitForm">
         <v-text-field
           v-model="requestData.title"
           :rules="titleRules"
@@ -36,6 +36,7 @@
           </v-card>
         </v-menu>
         <v-select
+          v-model="requestData.sprint"
           label="Select a sprint"
           :items="sprintList"
           :rules="sprintRules"
@@ -52,13 +53,17 @@
       </v-form>
     </v-sheet>
   </div>
+  <MessageHandler/>
 </template>
 
 <script>
 import {ref} from "vue";
 import {useDate} from "vuetify";
+import {useTasksStore} from "@/stores/app";
+import MessageHandler from "@/pages/MessageHandler.vue";
 
 export default {
+  components: {MessageHandler},
   setup() {
     const requestData = ref({
       title: null,
@@ -67,6 +72,8 @@ export default {
       sprint: null,
       priority: 'MINOR'
     })
+
+    const tasksStore = useTasksStore();
 
     const titleRules = [
       value => !!value || 'This field is required',
@@ -89,6 +96,10 @@ export default {
       {label: 'Sprint 3', value: 'SPRINT_3'}
     ])
 
+    function submitForm() {
+      tasksStore.addTask(requestData.value)
+    }
+
     return {
       requestData,
       titleRules,
@@ -96,7 +107,8 @@ export default {
       menu,
       isFormValid,
       sprintRules,
-      sprintList
+      sprintList,
+      submitForm
     }
   },
   computed: {
