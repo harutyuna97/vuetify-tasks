@@ -17,6 +17,12 @@ export const useTasksStore = defineStore('tasks', {
     tasks: [],
   }),
 
+  getters: {
+    tasksWithSpecificSprint() {
+      return (sprint) => this.tasks.filter((task) => task.sprint === sprint)
+    },
+  },
+
   actions: {
 
     getTasksList() {

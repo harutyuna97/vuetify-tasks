@@ -89,9 +89,9 @@ export default {
     const isFormValid = ref(false)
 
     const sprintList = ref([
-      {label: 'Sprint 1', value: 'SPRINT_1'},
-      {label: 'Sprint 2', value: 'SPRINT_2'},
-      {label: 'Sprint 3', value: 'SPRINT_3'}
+      {label: 'Sprint 1', value: 'SPRINT_ONE'},
+      {label: 'Sprint 2', value: 'SPRINT_TWO'},
+      {label: 'Sprint 3', value: 'SPRINT_THREE'}
     ])
 
     function submitForm() {

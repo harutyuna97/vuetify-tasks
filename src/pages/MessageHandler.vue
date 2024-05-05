@@ -8,6 +8,7 @@
     :color="message.type === messageTypes.SUCCESS ? 'green' : 'red'"
     :text="message.message"
     timeout="4000"
+    location="right"
   >
     <template v-slot:actions>
       <v-btn
