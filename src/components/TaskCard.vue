@@ -51,6 +51,7 @@
       </v-dialog>
     </div>
     <div
+      v-if="!task.done"
       class="priorityLine"
       :class="{
         'bg-green' : task.priority === priorities.MINOR,
