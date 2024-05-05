@@ -22,7 +22,7 @@ export const useTasksStore = defineStore('tasks', {
         const requestData = Object.keys(d.data).map((key) => [key, d.data[key]]);
         requestData.forEach(reqData => {
           reqData[1].id = reqData[0];
-          this.tasks.push(reqData[1])
+          this.tasks.push(reqData[1]);
         })
       })
       request.catch(error => {
