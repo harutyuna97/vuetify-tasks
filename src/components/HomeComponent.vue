@@ -17,6 +17,7 @@
           <TaskCard
             v-for="task in tasks"
             :key="task.id"
+            :task="task"
           ></TaskCard>
         </v-tabs-window-item>
 

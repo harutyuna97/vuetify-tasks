@@ -19,11 +19,13 @@ export const useTasksStore = defineStore('tasks', {
       this.tasks = [];
       const request = axios.get(fbUrl + '.json');
       request.then(d => {
-        const requestData = Object.keys(d.data).map((key) => [key, d.data[key]]);
-        requestData.forEach(reqData => {
-          reqData[1].id = reqData[0];
-          this.tasks.push(reqData[1]);
-        })
+        if (d.data) {
+          const requestData = Object.keys(d.data).map((key) => [key, d.data[key]]);
+          requestData.forEach(reqData => {
+            reqData[1].id = reqData[0];
+            this.tasks.push(reqData[1]);
+          })
+        }
       })
       request.catch(error => {
         notificationsStore.messages.push({type: Constants.MessageTypes.ERROR, message: error.message, show: true})
@@ -34,6 +36,7 @@ export const useTasksStore = defineStore('tasks', {
       const request = axios.post(fbUrl + '.json', task)
       request.then(() => {
         this.tasks.push(task)
+        this.router.push('/')
         notificationsStore.messages.push({type: Constants.MessageTypes.SUCCESS, message: 'Task successfully added', show: true})
       })
       request.catch(error => {

@@ -21,11 +21,13 @@
     <v-main>
       <router-view />
     </v-main>
+    <MessageHandler/>
   </v-app>
 </template>
 
 <script setup>
 import {ref} from "vue";
+import MessageHandler from "@/pages/MessageHandler.vue";
 
 let drawer = ref(false)
 </script>

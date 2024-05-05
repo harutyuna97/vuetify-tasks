@@ -53,24 +53,22 @@
       </v-form>
     </v-sheet>
   </div>
-  <MessageHandler/>
 </template>
 
 <script>
 import {ref} from "vue";
 import {useDate} from "vuetify";
 import {useTasksStore} from "@/stores/app";
-import MessageHandler from "@/pages/MessageHandler.vue";
 
 export default {
-  components: {MessageHandler},
   setup() {
     const requestData = ref({
       title: null,
       description: null,
       date: new Date(),
       sprint: null,
-      priority: 'MINOR'
+      priority: 'MINOR',
+      done: false
     })
 
     const tasksStore = useTasksStore();
