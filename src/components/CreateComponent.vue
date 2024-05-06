@@ -1,7 +1,7 @@
 <template>
-  <div class="mt-10">
+  <div class="mt-10" v-if="!loadingCreate">
     <v-sheet class="mx-auto" width="80%">
-      <v-form v-model="isFormValid" @submit.prevent>
+      <v-form v-model="isFormValid" @submit.prevent="submitForm">
         <v-text-field
           v-model="requestData.title"
           :rules="titleRules"
@@ -36,6 +36,7 @@
           </v-card>
         </v-menu>
         <v-select
+          v-model="requestData.sprint"
           label="Select a sprint"
           :items="sprintList"
           :rules="sprintRules"
@@ -43,37 +44,51 @@
           item-value="value"
         ></v-select>
         <v-radio-group label="Priority" v-model="requestData.priority">
-          <v-radio label="Minor" value="MINOR" color="green"></v-radio>
-          <v-radio label="Major" value="MAJOR" color="yellow"></v-radio>
-          <v-radio label="Critical" value="CRITICAL" color="red"></v-radio>
+          <v-radio label="Minor" :value="priorities.MINOR" color="green"></v-radio>
+          <v-radio label="Major" :value="priorities.MAJOR" color="yellow"></v-radio>
+          <v-radio label="Critical" :value="priorities.CRITICAL" color="red"></v-radio>
         </v-radio-group>
 
         <v-btn :disabled="!isFormValid" class="my-4" type="submit" block>Submit</v-btn>
       </v-form>
     </v-sheet>
   </div>
+  <LoadingHandler v-else/>
 </template>
 
 <script>
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import {useDate} from "vuetify";
+import {useTasksStore} from "@/stores/app";
+import {Constants} from "@/constants/constants";
+import LoadingHandler from "@/pages/LoadingHandler.vue";
+import {useLoadingStore} from "@/stores/loading";
+import {storeToRefs} from "pinia";
 
 export default {
+  components: {LoadingHandler},
   setup() {
+    const priorities = computed(() =>  Constants.Priorities)
+    const loadingStore = useLoadingStore()
+    const { loadingCreate } = storeToRefs(loadingStore)
+
     const requestData = ref({
       title: null,
       description: null,
       date: new Date(),
       sprint: null,
-      priority: 'MINOR'
+      priority: priorities.value.MINOR,
+      done: false
     })
 
+    const tasksStore = useTasksStore();
+
     const titleRules = [
-      value => !!value || 'This field is required',
+      value => !!value?.trim() || 'This field is required',
     ]
 
     const descriptionRules = [
-      value => !!value || 'This field is required',
+      value => !!value?.trim() || 'This field is required',
     ]
 
     const sprintRules = [
@@ -84,10 +99,22 @@ export default {
     const isFormValid = ref(false)
 
     const sprintList = ref([
-      {label: 'Sprint 1', value: 'SPRINT_1'},
-      {label: 'Sprint 2', value: 'SPRINT_2'},
-      {label: 'Sprint 3', value: 'SPRINT_3'}
+      {label: 'Sprint 1', value: 'SPRINT_ONE'},
+      {label: 'Sprint 2', value: 'SPRINT_TWO'},
+      {label: 'Sprint 3', value: 'SPRINT_THREE'}
     ])
+
+    function submitForm() {
+      tasksStore.addTask(requestData.value)
+    }
+
+    const changeDateFormat = computed(() => {
+      if (!requestData.value.date) {
+        return null
+      }
+      const [month, day, year] = useDate().format(requestData.value.date, 'keyboardDate').split('/')
+      return `${day}-${month}-${year}`
+    })
 
     return {
       requestData,
@@ -96,16 +123,11 @@ export default {
       menu,
       isFormValid,
       sprintRules,
-      sprintList
-    }
-  },
-  computed: {
-    changeDateFormat() {
-      if (!this.requestData.date) {
-        return null
-      }
-      const [month, day, year] = useDate().format(this.requestData.date, 'keyboardDate').split('/')
-      return `${day}-${month}-${year}`
+      sprintList,
+      submitForm,
+      changeDateFormat,
+      priorities,
+      loadingCreate
     }
   }
 }
