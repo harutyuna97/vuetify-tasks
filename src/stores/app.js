@@ -3,10 +3,12 @@ import { defineStore } from 'pinia'
 import { useNotificationsStore } from './notifications'
 import axios from "axios";
 import {Constants} from "@/constants/constants";
+import {useLoadingStore} from "@/stores/loading";
 
 const fbUrl = 'https://vuetify-tasks-default-rtdb.firebaseio.com/tasks'
 
 const notificationsStore = useNotificationsStore();
+const loadingStore = useLoadingStore();
 
 const inFlightUrls = new Set();
 
@@ -24,11 +26,8 @@ export const useTasksStore = defineStore('tasks', {
   actions: {
 
     getTasksList() {
+      loadingStore.loadingTasks = true;
       const url = fbUrl + '.json'
-      const inFlight = inFlightUrls.has(url);
-      if (inFlight) {
-        return;
-      }
       this.tasks = [];
       const request = axios.get(url);
       request.then(d => {
@@ -43,10 +42,11 @@ export const useTasksStore = defineStore('tasks', {
       request.catch(error => {
         notificationsStore.messages.push({type: Constants.MessageTypes.ERROR, message: error.message, show: true})
       })
-      request.finally(() => inFlightUrls.delete(url))
+      request.finally(() => loadingStore.loadingTasks = false)
     },
 
     addTask(task) {
+      loadingStore.loadingCreate = true;
       const url = fbUrl + '.json'
       const inFlight = inFlightUrls.has(url);
       if (inFlight) {
@@ -62,7 +62,10 @@ export const useTasksStore = defineStore('tasks', {
       request.catch(error => {
         notificationsStore.messages.push({type: Constants.MessageTypes.ERROR, message: error.message, show: true})
       })
-      request.finally(() => inFlightUrls.delete(url))
+      request.finally(() => {
+        inFlightUrls.delete(url);
+        loadingStore.loadingCreate = false;
+      })
     },
 
     deleteTask(taskId) {

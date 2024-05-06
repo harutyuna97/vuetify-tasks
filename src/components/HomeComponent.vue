@@ -11,7 +11,7 @@
   </v-tabs>
 
   <v-card-text>
-    <v-tabs-window v-model="selectedTab">
+    <v-tabs-window v-model="selectedTab" v-if="!loadingTasks">
       <v-tabs-window-item value="ALL">
         <div v-if="tasks.length">
           <TaskCard
@@ -72,6 +72,7 @@
         </div>
       </v-tabs-window-item>
     </v-tabs-window>
+    <LoadingHandler v-else/>
   </v-card-text>
 </template>
 
@@ -82,13 +83,17 @@ import {useTasksStore} from "@/stores/app";
 import {storeToRefs} from "pinia";
 import TaskCard from "@/components/TaskCard.vue";
 import NoTasksPage from "@/pages/NoTasksPage.vue";
+import {useLoadingStore} from "@/stores/loading";
+import LoadingHandler from "@/pages/LoadingHandler.vue";
 
 export default {
-  components: {NoTasksPage, TaskCard},
+  components: {LoadingHandler, NoTasksPage, TaskCard},
   setup() {
     const selectedTab = ref('ALL');
     const tasksStore = useTasksStore();
     const { tasks } = storeToRefs(tasksStore);
+    const loadingStore = useLoadingStore();
+    const { loadingTasks } = storeToRefs(loadingStore)
 
     function taskDone (task) {
       tasksStore.taskDone(task)
@@ -110,7 +115,8 @@ export default {
       tasks,
       taskDone,
       deleteTask,
-      filteredTasks
+      filteredTasks,
+      loadingTasks
     }
   }
 }

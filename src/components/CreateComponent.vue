@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-10">
+  <div class="mt-10" v-if="!loadingCreate">
     <v-sheet class="mx-auto" width="80%">
       <v-form v-model="isFormValid" @submit.prevent="submitForm">
         <v-text-field
@@ -53,6 +53,7 @@
       </v-form>
     </v-sheet>
   </div>
+  <LoadingHandler v-else/>
 </template>
 
 <script>
@@ -60,10 +61,16 @@ import {ref, computed} from "vue";
 import {useDate} from "vuetify";
 import {useTasksStore} from "@/stores/app";
 import {Constants} from "@/constants/constants";
+import LoadingHandler from "@/pages/LoadingHandler.vue";
+import {useLoadingStore} from "@/stores/loading";
+import {storeToRefs} from "pinia";
 
 export default {
+  components: {LoadingHandler},
   setup() {
     const priorities = computed(() =>  Constants.Priorities)
+    const loadingStore = useLoadingStore()
+    const { loadingCreate } = storeToRefs(loadingStore)
 
     const requestData = ref({
       title: null,
@@ -119,7 +126,8 @@ export default {
       sprintList,
       submitForm,
       changeDateFormat,
-      priorities
+      priorities,
+      loadingCreate
     }
   }
 }
